@@ -16,7 +16,7 @@
                     <h2>Dilly Dilly IoT Turret</h2>
                     <div id="video">
                         <!-- Set the MJPEG video stream URL in the image source below -->
-                        <img src="http://turret.fingaz.info:8080/?action=stream"/>
+			<!--<img src="http://turret.fingaz.info:8080/?action=stream"/> -->
                         <div id="calibrateLayer"></div>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                         </div> -->
                     </div>
                     <div>
-                        <input type="submit" value="FIRE!" onclick="javascript: fire();ß" />
+                        <input type="submit" value="FIRE!" onclick="javascript: fire();" />
                     </div>
                     <h3>Calibration</h3>
                     <div id="calibrationStep">
@@ -74,6 +74,18 @@
         <script src="{{ url_for('static', filename='js/vendor/raphael-min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/calibration.js') }}"></script>
         <script>
+	    function fire() {
+		    //alert("Hello");
+                $.ajax({ url: '/fire',
+		         type: 'GET',
+			 success: function () {
+				 alert("Success");
+			 },
+			 error: function () {
+				 alert("Error");
+			 }
+		});	 
+	    }
             $(document).ready(function() {
                 // Setup servo controls
                 var setupAxis = function(axis) {

@@ -77,7 +77,9 @@ def target(x, y):
 
 @app.route('/fire', methods=['GET'])
 def fire():
+    print "Calling fire";
     model.fire()
+
     #return successNoResponse()
     return url_for(main)
 
