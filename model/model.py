@@ -5,6 +5,8 @@ from time import sleep
 
 class LaserModel(object):
     def __init__(self, servos, servoMin, servoMax, servoXCenter, servoYCenter, firingarm, motorspeed):
+        self.xAxisValue = 0
+        self.yAxisValue = 0
         self.servos = servos
         self.servoMin = servoMin
         self.servoMax = servoMax
@@ -19,8 +21,6 @@ class LaserModel(object):
         self.calibrationFile = 'calibration.json'
         self._loadCalibration()
         self._generateTransform()
-        self.xAxisValue = 0
-        self.yAxisValue = 0
 
     def setaxisx(self, value):
         self.xAxisValue = self._validateAxis(value)
@@ -48,11 +48,11 @@ class LaserModel(object):
     def fire(self):
         self.setFiringArm(0)
         self.armMotor(self.motorspeed)
-        sleep(400)
+        sleep(0.4)
         self.setFiringArm(self.firingArm)
-        sleep(300)
+        sleep(0.3)
         self.setFiringArm(0)
-        sleep(500)
+        sleep(0.5)
         self.armMotor(0)
 
     def target(self, x, y):
@@ -84,23 +84,23 @@ class LaserModel(object):
     def armMotor(self, value):
         # If current motor speed is less than desired speed
         if self.currentmotorspeed < value:
-            while not self.currentmotorspeed is value:
+            while not int(self.currentmotorspeed) == int(value):
                 # If the different is greater than 20
                 if (self.currentmotorspeed + 20 <= value):
-                    self.currentmotorspeed += 20
+                    self.currentmotorspeed = int(self.currentmotorspeed) + 20
                     self.servos.setMotor(self.currentmotorspeed)
-                    sleep(100)
+                    sleep(0.1)
                 else:
                     self.currentmotorspeed = value
                     self.servos.setMotor(self.currentmotorspeed)
         # If current motor speed is higher than desired speed
         elif self.currentmotorspeed > value:
-            while not self.currentmotorspeed is value:
+            while not int(self.currentmotorspeed) == int(value):
                 # If the difference is greater than 20
                 if self.currentmotorspeed - 20 >= value:
                     self.currentmotorspeed -= 20
                     self.servos.setMotor(self.currentmotorspeed)
-                    sleep(100)
+                    sleep(0.1)
                 else:
                     self.currentmotorspeed = value
                     self.servos.setMotor(self.currentmotorspeed)

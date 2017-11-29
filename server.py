@@ -77,11 +77,9 @@ def target(x, y):
 
 @app.route('/fire', methods=['GET'])
 def fire():
-    print "Calling fire";
     model.fire()
-
     #return successNoResponse()
-    return url_for(main)
+    return successNoResponse()
 
 # Start running the flask app
 if __name__ == '__main__':
