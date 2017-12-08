@@ -11,6 +11,7 @@ class LaserModel(object):
         self.setYAxis(servoYCenter)
         self.firingArm = firingarm
         self.motorspeed = motorspeed
+        self.currentmotorspeed = 0
         self.targetCalibration = None
         self.servoCalibration = None
         self.transform = None
@@ -41,6 +42,16 @@ class LaserModel(object):
     def getCalibration(self):
         return self.targetCalibration, self.servoCalibration
 
+    def fire(self):
+        self.setFiringArm(0)
+        self.armMotor(self.motorspeed)
+        sleep(400)
+        self.setFiringArm(self.firingArm)
+        sleep(300)
+        self.setFiringArm(0)
+        sleep(500)
+        self.armMotor(0)
+
     def target(self, x, y):
         """Transform screen coordinate position to servo coordinate position and move servos accordingly."""
         if self.transform == None:
@@ -50,15 +61,15 @@ class LaserModel(object):
         servo = servo/servo[2]
         self.setXAxis(round(servo[0]))
         self.setYAxis(round(servo[1]))
-        if self.firingstate == True:
-            self.armMotor(self.motorspeed)
-            self.setFiringArm(0)
-            sleep(300)
-            self.setFiringArm(self.firingArm)
-            sleep(300)
-            self.setFiringArm(0)
-            sleep(300)
-            self.armMotor(0)
+#        if self.firingstate == True:
+#            self.armMotor(self.motorspeed)
+#            self.setFiringArm(0)
+#            sleep(300)
+#            self.setFiringArm(self.firingArm)
+#            sleep(300)
+#            self.setFiringArm(0)
+#            sleep(300)
+#            self.armMotor(0)
 
     def firingstate(self, state):
         if state == False:
@@ -68,7 +79,31 @@ class LaserModel(object):
             self.firingstate = True
 
     def armMotor(self, value):
-        self.servos.setMotor(value)
+        # If current motor speed is less than desired speed
+        if self.currentmotorspeed < value:
+            while not self.currentmotorspeed is value:
+                # If the different is greater than 20
+                if (self.currentmotorspeed + 20 <= value):
+                    self.currentmotorspeed += 20
+                    self.servos.setMotor(self.currentmotorspeed)
+                    sleep(100)
+                else:
+                    self.currentmotorspeed = value
+                    self.servos.setMotor(self.currentmotorspeed)
+        # If current motor speed is higher than desired speed
+        elif self.currentmotorspeed > value:
+            while not self.currentmotorspeed is value:
+                # If the difference is greater than 20
+                if self.currentmotorspeed - 20 >= value:
+                    self.currentmotorspeed -= 20
+                    self.servos.setMotor(self.currentmotorspeed)
+                    sleep(100)
+                else:
+                    self.currentmotorspeed = value
+                    self.servos.setMotor(self.currentmotorspeed)
+        else:
+            self.currentmotorspeed = value
+            self.servos.setMotor(value)
 
     def setFiringArm(self, value):
         self.servos.setFiring(value)

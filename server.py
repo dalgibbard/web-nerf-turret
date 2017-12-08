@@ -74,17 +74,10 @@ def target(x, y):
     model.target(x, y)
     return successNoResponse()
 
-@app.route('/firingstate/<state>', methods=['PUT'])
-def firingstate(state):
-    if str(state) == "true":
-        model.firingstate(True)
-    elif str(state) == "false":
-        model.firingstate(False)
+@app.route('/fire', methods=['GET'])
+def fire(state):
+    model.fire()
     return successNoResponse()
-
-@app.route('/firingstate', methods=['GET'])
-def getfiringstate(state):
-    return jsonify({'firingstate': model.firingstate}), 200
 
 # Start running the flask app
 if __name__ == '__main__':
