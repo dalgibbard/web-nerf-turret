@@ -83,8 +83,8 @@ def firingstate(state):
     return successNoResponse()
 
 @app.route('/firing/<bool:state>', methods=['GET'])
-    def getfiringstate(state):
-        return jsonify({'firingstate': model.firingstate}), 200
+def getfiringstate(state):
+    return jsonify({'firingstate': model.firingstate}), 200
 
 # Start running the flask app
 if __name__ == '__main__':
