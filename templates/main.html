@@ -8,6 +8,112 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" media="screen">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
         <script src="{{ url_for('static', filename='js/vendor/modernizr-2.6.2.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/vendor/jquery-1.10.1.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/vendor/json2.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/vendor/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/vendor/raphael-min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/calibration.js') }}"></script>
+        <script>
+            $(document).ready(function() {
+                // Setup servo controls
+                var setupAxis = function(axis) {
+                    var group = $('#' + axis);
+                    var input = group.find('input');
+                    var erroralert = group.find('div.alert-danger');
+                    var updateAxis = function() {
+                        $.ajax({ url: '/set/servo/' + axis + '/' + input.val(),
+                             type: 'PUT',
+                             error: function(request) {
+                                group.addClass('has-error');
+                                if (request.status === 500) {
+                                    erroralert.text($.parseJSON(request.responseText).result);
+                                    erroralert.show();
+                                }
+                             },
+                             success: function() {
+                                group.removeClass('has-error');
+                                erroralert.hide();
+                             }
+                        });
+                    };
+             function fireButton() {
+                 alert("Hello");
+             }
+                    //var fire = function(){
+                    //    $.ajax({ url: '/fire',
+                    //        type: 'GET',
+                    //        error: function(request) {
+                    //            group.addClass('has-error');
+                    //            if (request.status === 500) {
+                    //                erroralert.text($.parseJSON(request.responseText).result);
+                    //                erroralert.show();
+                    //            }
+                    //         },
+                    //         success: function() {
+                    //            group.removeClass('has-error');
+                    //            erroralert.hide();
+                    //         }
+                    //    });
+                    //};
+                    erroralert.hide();
+                    input.change(function() {
+                        updateAxis();
+                    });
+                    group.find('button.decrease').click(function() {
+                        input.val(Number(input.val()) - 5);
+                        updateAxis();
+                    });
+                    group.find('button.increase').click(function() {
+                        input.val(Number(input.val()) + 5);
+                        updateAxis();
+                    });
+                    group.find('button.fire').click(function() {
+                        fire();
+                    });
+                };
+                setupAxis('xaxis');
+                setupAxis('yaxis');
+
+                // Update servo positions by querying server
+                var updateServos = function() {
+                    $.get('/get/servos').done(function(data) {
+                        $('#xaxis input').val(data.xaxis);
+                        $('#yaxis input').val(data.yaxis);
+                    });
+                };
+
+
+                // Generate an event that fires when the video image is loaded.
+                // Use both the load event on the image, and a 1 second timeout as
+                // a fallback.  I found the fallback is necessary with Chrome
+                // because it sometimes never fires the load event for an MJPEG image.
+                var video = $('#video img').first();
+                var videoLoad = $.Deferred();
+                window.setTimeout(function() {
+                    videoLoad.resolve();
+                }, 1000);
+                video.load(function() {
+                    videoLoad.resolve();
+                });
+
+                // Wait for the video image to load, then setup calibration.
+                videoLoad.done(function() {
+                    calibration.setup('calibrateLayer', video.width(), video.height());
+                });
+
+                // Send target commands based on click locations
+                $('#calibrateLayer').click(function(ev) {
+                    if (!calibration.isCalibrating()) {
+                        $.ajax({
+                            url: '/target/' + ev.offsetX + '/' + ev.offsetY,
+                            type: 'PUT'
+                        }).done(function() {
+                            updateServos();
+                        });
+                    }
+                });
+            });
+        </script>
     </head>
     <body>
         <div class="container">
@@ -55,7 +161,7 @@
                         </div> -->
                     </div>
                     <div>
-                        <input type="submit" value="FIRE!" onclick="window.location='/fire';" />
+                        <input type="submit" value="FIRE!" onclick="fireButton()" />
                     </div>
                     <h3>Calibration</h3>
                     <div id="calibrationStep">
@@ -68,108 +174,6 @@
                 </div>
             </div>
         </div>
-        <script src="{{ url_for('static', filename='js/vendor/jquery-1.10.1.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/vendor/json2.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/vendor/bootstrap.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/vendor/raphael-min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/calibration.js') }}"></script>
-        <script>
-            $(document).ready(function() {
-                // Setup servo controls
-                var setupAxis = function(axis) {
-                    var group = $('#' + axis);
-                    var input = group.find('input');
-                    var erroralert = group.find('div.alert-danger');
-                    var updateAxis = function() {
-                        $.ajax({ url: '/set/servo/' + axis + '/' + input.val(),
-                             type: 'PUT',
-                             error: function(request) {
-                                group.addClass('has-error');
-                                if (request.status === 500) {
-                                    erroralert.text($.parseJSON(request.responseText).result);
-                                    erroralert.show();
-                                }
-                             },
-                             success: function() {
-                                group.removeClass('has-error');
-                                erroralert.hide();
-                             }
-                        });
-                    };
-                    //var fire = function(){
-                    //    $.ajax({ url: '/fire',
-                    //        type: 'GET',
-                    //        error: function(request) {
-                    //            group.addClass('has-error');
-                    //            if (request.status === 500) {
-                    //                erroralert.text($.parseJSON(request.responseText).result);
-                    //                erroralert.show();
-                    //            }
-                    //         },
-                    //         success: function() {
-                    //            group.removeClass('has-error');
-                    //            erroralert.hide();
-                    //         }
-                    //    });
-                    //};
-                    erroralert.hide();
-                    input.change(function() {
-                        updateAxis();
-                    });
-                    group.find('button.decrease').click(function() {
-                        input.val(Number(input.val()) - 5);
-                        updateAxis();
-                    });
-                    group.find('button.increase').click(function() {
-                        input.val(Number(input.val()) + 5);
-                        updateAxis();
-                    });
-                    group.find('button.fire').click(function() {
-                        fire();
-                    });
-                };
-                setupAxis('xaxis');
-                setupAxis('yaxis');
 
-                // Update servo positions by querying server
-                var updateServos = function() {
-                    $.get('/get/servos').done(function(data) {
-                        $('#xaxis input').val(data.xaxis);
-                        $('#yaxis input').val(data.yaxis);
-                    });
-                };
-
-                
-                // Generate an event that fires when the video image is loaded.
-                // Use both the load event on the image, and a 1 second timeout as
-                // a fallback.  I found the fallback is necessary with Chrome 
-                // because it sometimes never fires the load event for an MJPEG image.
-                var video = $('#video img').first();
-                var videoLoad = $.Deferred();
-                window.setTimeout(function() {
-                    videoLoad.resolve();
-                }, 1000);
-                video.load(function() {
-                    videoLoad.resolve();
-                });
-                
-                // Wait for the video image to load, then setup calibration.
-                videoLoad.done(function() {
-                    calibration.setup('calibrateLayer', video.width(), video.height());
-                });
-
-                // Send target commands based on click locations
-                $('#calibrateLayer').click(function(ev) {
-                    if (!calibration.isCalibrating()) {
-                        $.ajax({ 
-                            url: '/target/' + ev.offsetX + '/' + ev.offsetY, 
-                            type: 'PUT'
-                        }).done(function() {
-                            updateServos();
-                        });
-                    }
-                });
-            });
-        </script>
     </body>
 </html>
