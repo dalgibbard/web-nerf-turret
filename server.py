@@ -75,7 +75,7 @@ def target(x, y):
     return successNoResponse()
 
 @app.route('/fire', methods=['GET'])
-def fire(state):
+def fire():
     model.fire()
     return successNoResponse()
 
