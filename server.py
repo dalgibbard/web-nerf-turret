@@ -74,7 +74,7 @@ def target(x, y):
     model.target(x, y)
     return successNoResponse()
 
-@app.route('/firing/<bool:state>', methods=['PUT'])
+@app.route('/firingstate/<state>', methods=['PUT'])
 def firingstate(state):
     if str(state) == "true":
         model.firingstate(True)
@@ -82,7 +82,7 @@ def firingstate(state):
         model.firingstate(False)
     return successNoResponse()
 
-@app.route('/firing/<bool:state>', methods=['GET'])
+@app.route('/firingstate', methods=['GET'])
 def getfiringstate(state):
     return jsonify({'firingstate': model.firingstate}), 200
 
