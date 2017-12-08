@@ -1,4 +1,5 @@
 import serial
+from os import system
 
 class Servos(object):
     def __init__(self, baudrate, serialport):
@@ -7,10 +8,12 @@ class Servos(object):
 
     def writeSerial(self, command):
         try:
-            ser = serial.Serial(self.serialport, self.baudrate, timeout=1)
-            ser.close()
-            ser.open()
-            ser.write(str(command)+"\n")
+            #ser = serial.Serial(self.serialport, self.baudrate, timeout=1)
+            #ser.close()
+            #ser.open()
+            #ser.write(str(command)+"\n")
+            system("echo {0} > {1}".format(command, self.serialport))
+            #ser.flushInput()
         except serial.SerialException:
             pass
 
