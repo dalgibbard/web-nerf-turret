@@ -1,13 +1,16 @@
 import json
 import numpy as np
+from time import sleep
 
 class LaserModel(object):
-    def __init__(self, servos, servoMin, servoMax, servoCenter):
+    def __init__(self, servos, servoMin, servoMax, servoXCenter, servoYCenter, firingarm, motorspeed):
         self.servos = servos
         self.servoMin = servoMin
         self.servoMax = servoMax
-        self.setXAxis(servoCenter)
-        self.setYAxis(servoCenter)
+        self.setXAxis(servoXCenter)
+        self.setYAxis(servoYCenter)
+        self.firingArm = firingarm
+        self.motorspeed = motorspeed
         self.targetCalibration = None
         self.servoCalibration = None
         self.transform = None
@@ -47,6 +50,28 @@ class LaserModel(object):
         servo = servo/servo[2]
         self.setXAxis(round(servo[0]))
         self.setYAxis(round(servo[1]))
+        if self.firingstate == True:
+            self.armMotor(self.motorspeed)
+            self.setFiringArm(0)
+            sleep(300)
+            self.setFiringArm(self.firingArm)
+            sleep(300)
+            self.setFiringArm(0)
+            sleep(300)
+            self.armMotor(0)
+
+    def firingstate(self, state):
+        if state == False:
+            self.armMotor(0)
+            self.firingstate = False
+        if state == True:
+            self.firingstate = True
+
+    def armMotor(self, value):
+        self.servos.setMotor(value)
+
+    def setFiringArm(self, value):
+        self.servos.setFiring(value)
 
     def _validateAxis(self, value):
         """Validate servo value is within range of allowed values."""

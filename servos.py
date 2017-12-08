@@ -1,14 +1,27 @@
-from Adafruit_PWM_Servo_Driver import PWM
+import serial
 
 class Servos(object):
-	def __init__(self, i2cAddress, xAxisChannel, yAxisChannel, pwmFreqHz):
-		self.pwm = PWM(i2cAddress, debug=True)
-		self.pwm.setPWMFreq(pwmFreqHz)
-		self.xaxis = xAxisChannel
-		self.yaxis = yAxisChannel
+    def __init__(self, baudrate, serialport):
+        self.baudrate = baudrate
+        self.serialport = serialport
 
-	def setXAxis(self, value):
-		self.pwm.setPWM(self.xaxis, 0, value)
+    def writeSerial(self, command):
+        try:
+            ser = serial.Serial(self.serialport, self.baudrate, timeout=1)
+            ser.close()
+            ser.open()
+            ser.write(str(command)+"\n")
+        except serial.Exception:
+            continue
 
-	def setYAxis(self, value):
-		self.pwm.setPWM(self.yaxis, 0, value)
+    def setXAxis(self, value):
+        self.writeSerial("X"+str(value))
+
+    def setYAxis(self, value):
+        self.writeSerial("Y"+str(value))
+
+    def setMotor(self, value):
+        self.writeSerial("M"+str(value))
+
+    def setFiring(self, value):
+        self.writeSerial("F"+str(value))
