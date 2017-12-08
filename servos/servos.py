@@ -14,10 +14,10 @@ class Servos(object):
         except serial.SerialException:
             pass
 
-    def setXAxis(self, value):
+    def setaxisx(self, value):
         self.writeSerial("X"+str(value))
 
-    def setYAxis(self, value):
+    def setaxisy(self, value):
         self.writeSerial("Y"+str(value))
 
     def setMotor(self, value):
