@@ -48,11 +48,14 @@
                                 <button class="btn btn-default increase" type="button">+5 <span class="glyphicon glyphicon-chevron-right"></span></button>
                             </span>
                         </div>
-                        <div>
+                    <!--    <div>
                             <span>
                                 <button class="btn btn-default fire" type="button">FIRE</button>
                             </span>
-                        </div>
+                        </div> -->
+                    </div>
+                    <div>
+                        <input type="submit" value="FIRE!" onclick="window.location='/fire';" />
                     </div>
                     <h3>Calibration</h3>
                     <div id="calibrationStep">
@@ -93,22 +96,22 @@
                              }
                         });
                     };
-                    var fire = function(){
-                        $.ajax({ url: '/fire',
-                            type: 'GET',
-                            error: function(request) {
-                                group.addClass('has-error');
-                                if (request.status === 500) {
-                                    erroralert.text($.parseJSON(request.responseText).result);
-                                    erroralert.show();
-                                }
-                             },
-                             success: function() {
-                                group.removeClass('has-error');
-                                erroralert.hide();
-                             }
-                        });
-                    };
+                    //var fire = function(){
+                    //    $.ajax({ url: '/fire',
+                    //        type: 'GET',
+                    //        error: function(request) {
+                    //            group.addClass('has-error');
+                    //            if (request.status === 500) {
+                    //                erroralert.text($.parseJSON(request.responseText).result);
+                    //                erroralert.show();
+                    //            }
+                    //         },
+                    //         success: function() {
+                    //            group.removeClass('has-error');
+                    //            erroralert.hide();
+                    //         }
+                    //    });
+                    //};
                     erroralert.hide();
                     input.change(function() {
                         updateAxis();

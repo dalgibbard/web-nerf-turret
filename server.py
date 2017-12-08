@@ -1,8 +1,9 @@
-from flask import *
-import json, sys
+import json
 
-import model
-import servos
+from flask import *
+
+import model.model as modelobj
+from servos import servos
 
 # Flask app configuration
 DEBUG = True
@@ -24,7 +25,7 @@ app.config.from_object(__name__)
 # Setup the real servo when running on a Raspberry Pi
 servos = servos.Servos(BAUD_RATE, SERIAL_PORT)
 
-model = model.LaserModel(servos, SERVO_MIN, SERVO_MAX, SERVO_XCENTER, SERVO_YCENTER, FIRING_VALUE, MOTOR_VALUE)
+model = modelobj.LaserModel(servos, SERVO_MIN, SERVO_MAX, SERVO_XCENTER, SERVO_YCENTER, FIRING_VALUE, MOTOR_VALUE)
 
 # Main view for rendering the web page
 @app.route('/')
@@ -42,23 +43,23 @@ def successNoResponse():
 # API calls used by the web app
 @app.route('/set/servo/xaxis/<xaxis>', methods=['PUT'])
 def setServoXAxis(xaxis):
-    model.setXAxis(xaxis)
+    model.setaxisx(xaxis)
     return successNoResponse()
 
 @app.route('/set/servo/yaxis/<yaxis>', methods=['PUT'])
 def setServoYAaxis(yaxis):
-    model.setYAxis(yaxis)
+    model.setaxisy(yaxis)
     return successNoResponse()
 
 @app.route('/set/servos/<xaxis>/<yaxis>', methods=['PUT'])
 def setServos(xaxis, yaxis):
-    model.setXAxis(xaxis)
-    model.setYAxis(yaxis)
+    model.setaxisx(xaxis)
+    model.setaxisy(yaxis)
     return successNoResponse()
 
 @app.route('/get/servos', methods=['GET'])
 def getServos():
-    return jsonify({'xaxis': model.getXAxis(), 'yaxis': model.getYAxis() }), 200
+    return jsonify({'xaxis': model.getaxisx(), 'yaxis': model.getaxisy()}), 200
 
 @app.route('/get/calibration', methods=['GET'])
 def getCalibration():
@@ -77,7 +78,8 @@ def target(x, y):
 @app.route('/fire', methods=['GET'])
 def fire():
     model.fire()
-    return successNoResponse()
+    #return successNoResponse()
+    return url_for(main)
 
 # Start running the flask app
 if __name__ == '__main__':

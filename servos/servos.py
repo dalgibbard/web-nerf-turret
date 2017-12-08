@@ -11,7 +11,7 @@ class Servos(object):
             ser.close()
             ser.open()
             ser.write(str(command)+"\n")
-        except serial.Exception:
+        except serial.SerialException:
             pass
 
     def setXAxis(self, value):

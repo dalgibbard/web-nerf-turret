@@ -2,13 +2,14 @@ import json
 import numpy as np
 from time import sleep
 
+
 class LaserModel(object):
     def __init__(self, servos, servoMin, servoMax, servoXCenter, servoYCenter, firingarm, motorspeed):
         self.servos = servos
         self.servoMin = servoMin
         self.servoMax = servoMax
-        self.setXAxis(servoXCenter)
-        self.setYAxis(servoYCenter)
+        self.setaxisx(servoXCenter)
+        self.setaxisy(servoYCenter)
         self.firingArm = firingarm
         self.motorspeed = motorspeed
         self.currentmotorspeed = 0
@@ -18,19 +19,21 @@ class LaserModel(object):
         self.calibrationFile = 'calibration.json'
         self._loadCalibration()
         self._generateTransform()
+        self.xAxisValue = 0
+        self.yAxisValue = 0
 
-    def setXAxis(self, value):
+    def setaxisx(self, value):
         self.xAxisValue = self._validateAxis(value)
-        self.servos.setXAxis(self.xAxisValue)
+        self.servos.setaxisx(self.xAxisValue)
 
-    def getXAxis(self):
+    def getaxisx(self):
         return self.xAxisValue
 
-    def setYAxis(self, value):
+    def setaxisy(self, value):
         self.yAxisValue = self._validateAxis(value)
         self.servos.setYAxis(self.yAxisValue)
 
-    def getYAxis(self):
+    def getaxisy(self):
         return self.yAxisValue
 
     def setCalibration(self, targetCalibration, servoCalibration):
@@ -59,8 +62,8 @@ class LaserModel(object):
         screen = np.array([float(x), float(y), 1.0])
         servo = self.transform.dot(screen)
         servo = servo/servo[2]
-        self.setXAxis(round(servo[0]))
-        self.setYAxis(round(servo[1]))
+        self.setaxisx(round(servo[0]))
+        self.setaxisy(round(servo[1]))
 #        if self.firingstate == True:
 #            self.armMotor(self.motorspeed)
 #            self.setFiringArm(0)
