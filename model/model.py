@@ -31,7 +31,7 @@ class LaserModel(object):
 
     def setaxisy(self, value):
         self.yAxisValue = self._validateAxis(value)
-        self.servos.setYAxis(self.yAxisValue)
+        self.servos.setaxisy(self.yAxisValue)
 
     def getaxisy(self):
         return self.yAxisValue
